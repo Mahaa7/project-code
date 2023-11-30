@@ -1,0 +1,845 @@
+from tkinter import *
+from random import randint
+from PIL import Image, ImageTk
+from tkinter import messagebox
+
+
+
+def Deuteranopia():
+    root.withdraw()
+    dwu_window = Toplevel(root)
+    dwu_window.state('zoomed')
+    dwu_window.title("Rock Scissor Paper")
+    dwu_window.configure(background="#105081")
+
+    situation1_entry = Entry(dwu_window, font=50)
+    situation1_entry.grid(row=4, column=1, padx=20, pady=(20, 0))
+
+    situation2_entry = Entry(dwu_window, font=50)
+    situation2_entry.grid(row=4, column=3, padx=20, pady=(20, 0))
+
+    # picture
+    rock_img = ImageTk.PhotoImage(Image.open("rock for deut.png"))
+    paper_img = ImageTk.PhotoImage(Image.open("paper for deu2.png"))
+    scissor_img = ImageTk.PhotoImage(Image.open("scissors for deut.png"))
+    rock_img_comp = ImageTk.PhotoImage(Image.open("rock for deu2.png"))
+    paper_img_comp = ImageTk.PhotoImage(Image.open("paper for deut.png"))
+    scissor_img_comp = ImageTk.PhotoImage(Image.open("scissors for deu22.png"))
+
+    # insert picture
+    user_label = Label(dwu_window, image=scissor_img, bg="#105081")
+    comp_label = Label(dwu_window, image=scissor_img_comp, bg="#105081")
+    comp_label.grid(row=1, column=0, padx=25, pady=25)
+    user_label.grid(row=1, column=4, padx=25, pady=25)
+
+    # scores
+    playerScore = Label(dwu_window, text=0, font=100, bg="#105081", fg="Goldenrod")
+    computerScore = Label(dwu_window, text=0, font=100, bg="#105081", fg="Goldenrod")
+    computerScore.grid(row=1, column=1)
+    playerScore.grid(row=1, column=3)
+
+    # indicators
+    user_indicator = Label(dwu_window, font=50, text="USER", bg="#105081", fg="Goldenrod")
+    comp_indicator = Label(dwu_window, font=50, text="COMPUTER", bg="#105081", fg="Goldenrod")
+    user_indicator.grid(row=0, column=4)
+    comp_indicator.grid(row=0, column=0)
+
+    # messages
+    msg = Label(dwu_window, font=50, bg="#105081", fg="Goldenrod")
+    msg.grid(row=3, column=2)
+
+    # update message
+    def updateMessage(x):
+        msg['text'] = x
+
+    def updateUserScore():
+        situation2 = situation2_entry.get()
+        score = int(playerScore["text"])
+        score += 1
+        playerScore["text"] = str(score)
+        if score >= 3:
+            updateMessage(f"Congratulations! You won the game and the choice is {situation2}")
+            disableButtons()
+        situation2_length = len(situation2)
+        if situation2_length == 0:
+            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+            return  # Return to prevent further execution
+
+    def updateCompScore():
+        situation1 = situation1_entry.get()
+        score = int(computerScore["text"])
+        score += 1
+        computerScore["text"] = str(score)
+        if score >= 3:
+            updateMessage(f"Sorry, you lost the game and the choice is {situation1}")
+            disableButtons()
+        situation1_length = len(situation1)
+        if situation1_length == 0:
+            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+            return  # Return to prevent further execution
+
+    # check winner
+
+    # Function to increment the play counter and check if it's the third play
+    def playRound(playerChoice):
+        global playCounter
+        playCounter += 1
+        if playCounter == 3:
+            checkWin(playerChoice, computerScore)
+
+    # check winner
+    def checkWin(player, computer):
+        if player == computer:
+            updateMessage("It's a tie!!!")
+        elif player == "rock":
+            if computer == "paper":
+                updateMessage("You lose")
+                updateCompScore()
+            else:
+                updateMessage("You Win")
+                updateUserScore()
+        elif player == "paper":
+            if computer == "scissor":
+                updateMessage("You lose")
+                updateCompScore()
+            else:
+                updateMessage("You Win")
+                updateUserScore()
+        elif player == "scissor":
+            if computer == "rock":
+                updateMessage("You lose")
+                updateCompScore()
+            else:
+                updateMessage("You Win")
+                updateUserScore()
+        else:
+            pass
+        if int(playerScore["text"]) >= 3 or int(computerScore["text"]) >= 3:
+            announceWinner()
+
+    def announceWinner():
+        situation1 = situation1_entry.get()
+        situation2 = situation2_entry.get()
+        player_score = int(playerScore["text"])
+        computer_score = int(computerScore["text"])
+        if player_score > computer_score:
+            winner = (f"Congratulations! You're the winner\n"
+                      f" the choice is {situation2}")
+        else:
+            winner = (f'Sorry, you lost\n '
+                      f'the choice is {situation1}')
+        updateMessage(f"{winner}!")
+        disableButtons()
+
+    # update choices
+    choices = ["rock", "paper", "scissor"]
+
+    def updateChoice(x):
+        # for computer
+        compChoice = choices[randint(0, 2)]
+        if compChoice == "rock":
+            comp_label.configure(image=rock_img_comp)
+        elif compChoice == "paper":
+            comp_label.configure(image=paper_img_comp)
+        else:
+            comp_label.configure(image=scissor_img_comp)
+
+        # for user
+        if x == "rock":
+            user_label.configure(image=rock_img)
+        elif x == "paper":
+            user_label.configure(image=paper_img)
+        else:
+            user_label.configure(image=scissor_img)
+
+        checkWin(x, compChoice)
+
+        # disable buttons
+
+    def disableButtons():
+        rock.config(state=DISABLED)
+        paper.config(state=DISABLED)
+        scissor.config(state=DISABLED)
+
+    # Function to reset the game
+    def replay_game():
+        # Reset scores to 0
+        playerScore["text"] = "0"
+        computerScore["text"] = "0"
+
+        # Reset choice labels to default image
+        user_label.configure(image=scissor_img)
+        comp_label.configure(image=scissor_img_comp)
+
+        # Enable buttons
+        rock.config(state=NORMAL)
+        paper.config(state=NORMAL)
+        scissor.config(state=NORMAL)
+
+        # Clear message label
+        updateMessage("")
+
+    # Function to return to the main window
+    def return_to_main():
+        dwu_window.destroy()  # Close the dwu_window
+        root.deiconify()  # Show the main window
+
+    # buttons
+    rock = Button(dwu_window, width=20, height=2, text="ROCK", bg="#6D83CE", fg="Goldenrod", activebackground="#6D83CE", command=lambda: updateChoice("rock"))
+    rock.grid(row=2, column=1)
+
+    paper = Button(dwu_window, width=20, height=2, text="PAPER", bg="#F2DE30", fg="Goldenrod", activebackground="#F2DE30", command=lambda: updateChoice("paper"))
+    paper.grid(row=2, column=2)
+
+    return_button = Button(dwu_window, width=20, height=2, text="RETURN", bg="#105081", fg="Goldenrod", activebackground="#105081", command=replay_game)
+    return_button.grid(row=7, column=3, pady=(50, 0))
+
+    scissor = Button(dwu_window, width=20, height=2, text="SCISSOR", bg="#1050B1", fg="Goldenrod", activebackground="#1050B1", command=lambda: updateChoice("scissor"))
+    scissor.grid(row=2, column=3)
+
+    menubar = Menu(root)
+    menu = Menu(menubar, tearoff=0)
+    menubar.add_cascade(label='Menu', menu=menu)
+    menu.add_command(label='HOME', command=return_to_main)
+    menu.add_command(label='QUIT', command=dwu_window.destroy)
+    dwu_window.config(menu=menubar)
+
+    mainloop()
+
+def Protanopia():
+    root.withdraw()
+    pro_window = Toplevel(root)
+    pro_window.state('zoomed')
+    pro_window.title("Rock Scissor Paper")
+    pro_window.configure(background="#6D6417")
+
+    situation1_entry = Entry(pro_window, font=50)
+    situation1_entry.grid(row=4, column=1, padx=20, pady=(20, 0))
+
+    situation2_entry = Entry(pro_window, font=50)
+    situation2_entry.grid(row=4, column=3, padx=20, pady=(20, 0))
+
+    # picture
+    rock_img = ImageTk.PhotoImage(Image.open("rock for prot.png"))
+    paper_img = ImageTk.PhotoImage(Image.open("Paper for Prot2.png"))
+    scissor_img = ImageTk.PhotoImage(Image.open("scissors for prot.png"))
+    rock_img_comp = ImageTk.PhotoImage(Image.open("rock for prot2.png"))
+    paper_img_comp = ImageTk.PhotoImage(Image.open("Paper for Prot.png"))
+    scissor_img_comp = ImageTk.PhotoImage(Image.open("scissors for prot2.png"))
+    # insert picture
+    user_label = Label(pro_window, image=scissor_img, bg="#6D6417")
+    comp_label = Label(pro_window, image=scissor_img_comp, bg="#6D6417")
+    comp_label.grid(row=1, column=0, padx=25, pady=25)
+    user_label.grid(row=1, column=4, padx=25, pady=25)
+    # scores
+    playerScore = Label(pro_window, text=0, font=100, bg="#6D6417", fg="Navy")
+    computerScore = Label(pro_window, text=0, font=100, bg="#6D6417", fg="Navy")
+    computerScore.grid(row=1, column=1)
+    playerScore.grid(row=1, column=3)
+    # indicators
+    user_indicator = Label(pro_window, font=50, text="USER", bg="#6D6417", fg="Navy")
+    comp_indicator = Label(pro_window, font=50, text="COMPUTER",bg="#6D6417", fg="Navy")
+    user_indicator.grid(row=0, column=4)
+    comp_indicator.grid(row=0, column=0)
+    # messages
+    msg = Label(pro_window, font=50, bg="#6D6417", fg="Navy")
+    msg.grid(row=3, column=2)
+
+    # update message
+    def updateMessage(x):
+        msg['text'] = x
+
+    def updateUserScore():
+        situation2 = situation2_entry.get()
+        score = int(playerScore["text"])
+        score += 1
+        playerScore["text"] = str(score)
+        if score >= 3:
+            updateMessage(f"Congratulations! You won the game and the choice is {situation2}")
+            disableButtons()
+        situation2_length = len(situation2)
+        if situation2_length == 0:
+            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+            return  # Return to prevent further execution
+
+    def updateCompScore():
+        situation1 = situation1_entry.get()
+        score = int(computerScore["text"])
+        score += 1
+        computerScore["text"] = str(score)
+        if score >= 3:
+            updateMessage(f"Sorry, you lost the game and the choice is {situation1}")
+            disableButtons()
+        situation1_length = len(situation1)
+        if situation1_length == 0:
+            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+            return  # Return to prevent further execution
+
+    # Function to increment the play counter and check if it's the third play
+
+
+    def playRound(playerChoice):
+        global playCounter
+        playCounter += 1
+        if playCounter == 3:
+            checkWin(playerChoice, computerScore)
+    # check winner
+    def checkWin(player, computer):
+        if player == computer:
+            updateMessage("It's a tie!!!")
+        elif player == "rock":
+            if computer == "paper":
+                updateMessage("You lose")
+                updateCompScore()
+            else:
+                updateMessage("You Win")
+                updateUserScore()
+        elif player == "paper":
+            if computer == "scissor":
+                updateMessage("You lose")
+                updateCompScore()
+            else:
+                updateMessage("You Win")
+                updateUserScore()
+        elif player == "scissor":
+            if computer == "rock":
+               updateMessage("You lose")
+               updateCompScore()
+            else:
+               updateMessage("You Win")
+               updateUserScore()
+        else:
+            pass
+        if int(playerScore["text"]) >= 3 or int(computerScore["text"]) >= 3:
+            announceWinner()
+
+    def announceWinner():
+        situation1 = situation1_entry.get()
+        situation2 = situation2_entry.get()
+        player_score = int(playerScore["text"])
+        computer_score = int(computerScore["text"])
+        if player_score > computer_score:
+            winner = (f"Congratulations! You're the winner\n"
+                      f" the choice is {situation2}")
+        else:
+            winner = (f'Sorry, you lost\n '
+                      f'the choice is {situation1}')
+        updateMessage(f"{winner}!")
+        disableButtons()
+
+    # update choices
+    choices = ["rock", "paper", "scissor"]
+    def updateChoice(x):
+        # for computer
+        compChoice = choices[randint(0, 2)]
+        if compChoice == "rock":
+            comp_label.configure(image=rock_img_comp)
+        elif compChoice == "paper":
+            comp_label.configure(image=paper_img_comp)
+        else:
+            comp_label.configure(image=scissor_img_comp)
+        # for user
+        if x == "rock":
+            user_label.configure(image=rock_img)
+        elif x == "paper":
+            user_label.configure(image=paper_img)
+        else:
+            user_label.configure(image=scissor_img)
+        checkWin(x, compChoice)
+
+    # disable buttons
+    def disableButtons():
+        rock.config(state=DISABLED)
+        paper.config(state=DISABLED)
+        scissor.config(state=DISABLED)
+
+    # Function to reset the game
+    def replay_game():
+        # Reset scores to 0
+        playerScore["text"] = "0"
+        computerScore["text"] = "0"
+        # Reset choice labels to default image
+        user_label.configure(image=scissor_img)
+        comp_label.configure(image=scissor_img_comp)
+        # Enable buttons
+        rock.config(state=NORMAL)
+        paper.config(state=NORMAL)
+        scissor.config(state=NORMAL)
+        # Clear message label
+        updateMessage("")
+        # Function to return to the main window
+    def return_to_main():
+        pro_window.destroy()  # Close the dwu_window
+        root.deiconify()  # Show the main window
+    # buttons
+    rock = Button(pro_window, width=20, height=2, text="ROCK", bg="#788BCF", fg="Navy", activebackground="#788BCF", command=lambda: updateChoice("rock"))
+    rock.grid(row=2, column=1)
+    paper = Button(pro_window, width=20, height=2, text="PAPER", bg="#0134B1", fg="Navy", activebackground="#0134B1", command=lambda: updateChoice("paper"))
+    paper.grid(row=2, column=2)
+    scissor = Button(pro_window, width=20, height=2, text="SCISSOR", bg="#D5A603", fg="Navy", activebackground="#D5A603", command=lambda: updateChoice("scissor"))
+    scissor.grid(row=2, column=3)
+    return_button = Button(pro_window, width=20, height=2, text="RETURN",bg="#6D6417", fg="Navy", activebackground="#6D6417", command=replay_game)
+    return_button.grid(row=7, column=3, pady=(50, 0))
+
+    menubar = Menu(root)
+    menu = Menu(menubar, tearoff=0)
+    menubar.add_cascade(label='Menu', menu=menu)
+    menu.add_command(label='HOME', command=return_to_main)
+    menu.add_command(label='QUIT', command=pro_window.destroy)
+    pro_window.config(menu=menubar)
+
+    mainloop()
+
+def Tritanopia():
+    root.withdraw()
+    tri_window = Toplevel(root)
+    tri_window.state('zoomed')
+    tri_window.title("Rock Scissor Paper")
+    tri_window.configure(background="#FFE2E7")
+
+    situation1_entry = Entry(tri_window, font=50)
+    situation1_entry.grid(row=4, column=1, padx=20, pady=(20, 0))
+
+    situation2_entry = Entry(tri_window, font=50)
+    situation2_entry.grid(row=4, column=3, padx=20, pady=(20, 0))
+
+    # picture
+    rock_img = ImageTk.PhotoImage(Image.open("rock for trit.png"))
+    paper_img = ImageTk.PhotoImage(Image.open("paper for trit2.png"))
+    scissor_img = ImageTk.PhotoImage(Image.open("scissors for trit.png"))
+    rock_img_comp = ImageTk.PhotoImage(Image.open("rock for trit2.png"))
+    paper_img_comp = ImageTk.PhotoImage(Image.open("paper for trit.png"))
+    scissor_img_comp = ImageTk.PhotoImage(Image.open("scissors for trit 2.png"))
+
+    # insert picture
+    user_label = Label(tri_window, image=scissor_img, bg="#FFE2E7")
+    comp_label = Label(tri_window, image=scissor_img_comp, bg="#FFE2E7")
+    comp_label.grid(row=1, column=0, padx=25, pady=25)
+    user_label.grid(row=1, column=4, padx=25, pady=25)
+
+
+    # indicators
+    user_indicator = Label(tri_window, font=50, text="USER", bg="#FFE2E7", fg="Mediumvioletred")
+    comp_indicator = Label(tri_window, font=50, text="COMPUTER", bg="#FFE2E7", fg="Mediumvioletred")
+    user_indicator.grid(row=0, column=4)
+    comp_indicator.grid(row=0, column=0)
+
+    # scores
+    playerScore = Label(tri_window, text=0, font=100, bg="#FFE2E7", fg="Mediumvioletred")
+    computerScore = Label(tri_window, text=0, font=100, bg="#FFE2E7", fg="Mediumvioletred")
+    computerScore.grid(row=1, column=1)
+    playerScore.grid(row=1, column=3)
+
+    # messages
+    msg = Label(tri_window, font=50, bg="#FFE2E7", fg="Mediumvioletred")
+    msg.grid(row=3, column=2)
+
+    # update message
+
+    def updateMessage(x):
+        msg['text'] = x
+
+    def updateUserScore():
+        situation2 = situation2_entry.get()
+        score = int(playerScore["text"])
+        score += 1
+        playerScore["text"] = str(score)
+        if score >= 3:
+            updateMessage(f"Congratulations! You won the game and the choice is {situation2}")
+            disableButtons()
+        situation2_length = len(situation2)
+        if situation2_length == 0:
+            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+            return  # Return to prevent further execution
+
+
+    def updateCompScore():
+        situation1 = situation1_entry.get()
+        score = int(computerScore["text"])
+        score += 1
+        computerScore["text"] = str(score)
+        if score >= 3:
+            updateMessage(f"Sorry, you lost the game and the choice is {situation1}")
+            disableButtons()
+        situation1_length = len(situation1)
+        if situation1_length == 0:
+            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+            return  # Return to prevent further execution
+
+
+
+
+    # Function to increment the play counter and check if it's the third play
+    def playRound(playerChoice):
+        global playCounter
+        playCounter += 1
+        if playCounter == 3:
+            checkWin(playerChoice, computerScore)
+
+    # check winner
+    def checkWin(player, computer):
+        if player == computer:
+            updateMessage("It's a tie!!!")
+        elif player == "rock":
+            if computer == "paper":
+                updateMessage("You lose")
+                updateCompScore()
+            else:
+                updateMessage("You Win")
+                updateUserScore()
+        elif player == "paper":
+            if computer == "scissor":
+                updateMessage("You lose")
+                updateCompScore()
+            else:
+                updateMessage("You Win")
+                updateUserScore()
+        elif player == "scissor":
+            if computer == "rock":
+                updateMessage("You lose")
+                updateCompScore()
+            else:
+                updateMessage("You Win")
+                updateUserScore()
+        else:
+            pass
+        if int(playerScore["text"]) >= 3 or int(computerScore["text"]) >= 3:
+            announceWinner()
+
+
+    def announceWinner():
+        situation1 = situation1_entry.get()
+        situation2 = situation2_entry.get()
+        player_score = int(playerScore["text"])
+        computer_score = int(computerScore["text"])
+        if player_score > computer_score:
+            winner = (f"Congratulations! You're the winner\n "
+                      f"the choice is {situation2}")
+        else:
+            winner = (f'Sorry, you lost\n '
+                      f'the choice is {situation1}')
+        updateMessage(f"{winner}!")
+        disableButtons()
+
+    # update choices
+
+
+    choices = ["rock", "paper", "scissor"]
+
+
+    def updateChoice(x):
+    # for computer
+        compChoice = choices[randint(0, 2)]
+        if compChoice == "rock":
+            comp_label.configure(image=rock_img_comp)
+        elif compChoice == "paper":
+            comp_label.configure(image=paper_img_comp)
+        else:
+            comp_label.configure(image=scissor_img_comp)
+
+        # for user
+        if x == "rock":
+            user_label.configure(image=rock_img)
+        elif x == "paper":
+            user_label.configure(image=paper_img)
+        else:
+            user_label.configure(image=scissor_img)
+
+        checkWin(x, compChoice)
+
+
+# disable buttons
+    def disableButtons():
+        rock.config(state=DISABLED)
+        paper.config(state=DISABLED)
+        scissor.config(state=DISABLED)
+
+    # Function to reset the game
+
+
+    def replay_game():
+        # Reset scores to 0
+        playerScore["text"] = "0"
+        computerScore["text"] = "0"
+
+        # Reset choice labels to default image
+        user_label.configure(image=scissor_img)
+        comp_label.configure(image=scissor_img_comp)
+
+        # Enable buttons
+        rock.config(state=NORMAL)
+        paper.config(state=NORMAL)
+        scissor.config(state=NORMAL)
+
+        # Clear message label
+        updateMessage("")
+
+        # Function to return to the main window
+
+
+    def return_to_main():
+        tri_window.destroy()  # Close the dwu_window
+        root.deiconify()  # Show the main window
+
+
+    # buttons
+    rock = Button(tri_window, width=20, height=2, text="ROCK", bg="#AEDBF0", fg="Mediumvioletred",activebackground="#AEDBF0", command=lambda: updateChoice("rock"))
+    rock.grid(row=2, column=1)
+
+    paper = Button(tri_window, width=20, height=2, text="PAPER", bg="#12A5C6", fg="Mediumvioletred",activebackground="#12A5C6", command=lambda: updateChoice("paper"))
+    paper.grid(row=2, column=2)
+
+    scissor = Button(tri_window, width=20, height=2, text="SCISSOR", bg="#B55F7A", fg="Mediumvioletred", activebackground="#B55F7A", command=lambda: updateChoice("scissor"))
+    scissor.grid(row=2, column=3)
+
+    return_button = Button(tri_window, width=20, height=2, text="RETURN", bg="#FFE2E7", fg="Mediumvioletred", activebackground="#FFE2E7", command=replay_game)
+    return_button.grid(row=7, column=3, pady=(50, 0))
+
+    menubar = Menu(root)
+    menu = Menu(menubar, tearoff=0)
+    menubar.add_cascade(label='Menu', menu=menu)
+    menu.add_command(label='HOME', command=return_to_main)
+    menu.add_command(label='QUIT', command=tri_window.destroy)
+    tri_window.config(menu=menubar)
+
+    mainloop()
+
+def Achromatopsia():
+    root.withdraw()
+    ach_window = Toplevel(root)
+    ach_window.state('zoomed')
+    ach_window.title("Rock Scissor Paper")
+    ach_window.configure(background="#D5D5D5")
+
+    situation1_entry = Entry(ach_window, font=50)
+    situation1_entry.grid(row=4, column=1, padx=20, pady=(20, 0))
+
+    situation2_entry = Entry(ach_window, font=50)
+    situation2_entry.grid(row=4, column=3, padx=20, pady=(20, 0))
+
+    # picture
+    rock_img = ImageTk.PhotoImage(Image.open("rock for ach.png"))
+    paper_img = ImageTk.PhotoImage(Image.open("paper for ach2.png"))
+    scissor_img = ImageTk.PhotoImage(Image.open("scissors for ach.png"))
+    rock_img_comp = ImageTk.PhotoImage(Image.open("rock for ach2.png"))
+    paper_img_comp = ImageTk.PhotoImage(Image.open("paper for ach.png"))
+    scissor_img_comp = ImageTk.PhotoImage(Image.open("scissors for ach2.png"))
+
+    # insert picture
+    user_label = Label(ach_window, image=scissor_img, bg="#D5D5D5")
+    comp_label = Label(ach_window, image=scissor_img_comp, bg="#D5D5D5")
+    comp_label.grid(row=1, column=0, padx=25, pady=25)
+    user_label.grid(row=1, column=4, padx=25, pady=25)
+
+    # scores
+    playerScore = Label(ach_window, text=0, font=100, bg="#D5D5D5", fg="Black")
+    computerScore = Label(ach_window, text=0, font=100, bg="#D5D5D5", fg="Black")
+    computerScore.grid(row=1, column=1)
+    playerScore.grid(row=1, column=3)
+
+    # indicators
+    user_indicator = Label(ach_window, font=50, text="USER", bg="#D5D5D5", fg="Black")
+    comp_indicator = Label(ach_window, font=50, text="COMPUTER", bg="#D5D5D5", fg="Black")
+    user_indicator.grid(row=0, column=4)
+    comp_indicator.grid(row=0, column=0)
+
+    # messages
+    msg = Label(ach_window, font=50, bg="#D5D5D5", fg="Black")
+    msg.grid(row=3, column=2)
+
+    # update message
+    def updateMessage(x):
+        msg['text'] = x
+
+    def updateUserScore():
+        situation2 = situation2_entry.get()
+        score = int(playerScore["text"])
+        score += 1
+        playerScore["text"] = str(score)
+        if score >= 3:
+            updateMessage(f"Congratulations! You won the game and the choice is {situation2}")
+            disableButtons()
+        situation2_length = len(situation2)
+        if situation2_length == 0:
+            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+            return  # Return to prevent further execution
+
+    def updateCompScore():
+        situation1 = situation1_entry.get()
+        score = int(computerScore["text"])
+        score += 1
+        computerScore["text"] = str(score)
+        if score >= 3:
+            updateMessage(f"Sorry, you lost the game and the choice is {situation1}")
+            disableButtons()
+        situation1_length = len(situation1)
+        if situation1_length == 0:
+            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+            return  # Return to prevent further execution
+
+    # check winner
+
+    # Function to increment the play counter and check if it's the third play
+    def playRound(playerChoice):
+        global playCounter
+        playCounter += 1
+        if playCounter == 3:
+            checkWin(playerChoice, computerScore)
+
+    # check winner
+    def checkWin(player, computer):
+        if player == computer:
+            updateMessage("It's a tie!!!")
+        elif player == "rock":
+            if computer == "paper":
+                updateMessage("You lose")
+                updateCompScore()
+            else:
+                updateMessage("You Win")
+                updateUserScore()
+        elif player == "paper":
+            if computer == "scissor":
+                updateMessage("You lose")
+                updateCompScore()
+            else:
+                updateMessage("You Win")
+                updateUserScore()
+        elif player == "scissor":
+            if computer == "rock":
+                updateMessage("You lose")
+                updateCompScore()
+            else:
+                updateMessage("You Win")
+                updateUserScore()
+        else:
+            pass
+        if int(playerScore["text"]) >= 3 or int(computerScore["text"]) >= 3:
+            announceWinner()
+
+    def announceWinner():
+        situation1 = situation1_entry.get()
+        situation2 = situation2_entry.get()
+        player_score = int(playerScore["text"])
+        computer_score = int(computerScore["text"])
+        if player_score > computer_score:
+            winner = (f"Congratulations! You're the winner\n"
+                      f" the choice is {situation2}")
+        else:
+            winner = (f'Sorry, you lost\n '
+                      f'the choice is {situation1}')
+        updateMessage(f"{winner}!")
+        disableButtons()
+
+    # update choices
+    choices = ["rock", "paper", "scissor"]
+
+    def updateChoice(x):
+        # for computer
+        compChoice = choices[randint(0, 2)]
+        if compChoice == "rock":
+            comp_label.configure(image=rock_img_comp)
+        elif compChoice == "paper":
+            comp_label.configure(image=paper_img_comp)
+        else:
+            comp_label.configure(image=scissor_img_comp)
+
+        # for user
+        if x == "rock":
+            user_label.configure(image=rock_img)
+        elif x == "paper":
+            user_label.configure(image=paper_img)
+        else:
+            user_label.configure(image=scissor_img)
+
+        checkWin(x, compChoice)
+
+        # disable buttons
+
+    def disableButtons():
+        rock.config(state=DISABLED)
+        paper.config(state=DISABLED)
+        scissor.config(state=DISABLED)
+
+    # Function to reset the game
+    def replay_game():
+        # Reset scores to 0
+        playerScore["text"] = "0"
+        computerScore["text"] = "0"
+
+        # Reset choice labels to default image
+        user_label.configure(image=scissor_img)
+        comp_label.configure(image=scissor_img_comp)
+
+        # Enable buttons
+        rock.config(state=NORMAL)
+        paper.config(state=NORMAL)
+        scissor.config(state=NORMAL)
+
+        # Clear message label
+        updateMessage("")
+
+    # Function to return to the main window
+    def return_to_main():
+        ach_window.destroy()  # Close the ach_window
+        root.deiconify()  # Show the main window
+
+    # buttons
+    rock = Button(ach_window, width=20, height=2, text="ROCK", bg="#D5D5D5", fg="Black", activebackground="#D5D5D5",
+                  command=lambda: updateChoice("rock"))
+    rock.grid(row=2, column=1)
+
+    paper = Button(ach_window, width=20, height=2, text="PAPER", bg="#717171", fg="Black",
+                   activebackground="#717171", command=lambda: updateChoice("paper"))
+    paper.grid(row=2, column=2)
+
+    return_button = Button(ach_window, width=20, height=2, text="RETURN", bg="#939393", fg="Black",
+                           activebackground="#939393", command=replay_game)
+    return_button.grid(row=7, column=3, pady=(50, 0))
+
+    scissor = Button(ach_window, width=20, height=2, text="SCISSOR", bg="#3B3B3B", fg="Black",
+                     activebackground="#3B3B3B", command=lambda: updateChoice("scissor"))
+    scissor.grid(row=2, column=3)
+
+    menubar = Menu(root)
+    menu = Menu(menubar, tearoff=0)
+    menubar.add_cascade(label='Menu', menu=menu)
+    menu.add_command(label='HOME', command=return_to_main)
+    menu.add_command(label='QUIT', command=ach_window.destroy)
+    ach_window.config(menu=menubar)
+
+    mainloop()
+
+
+root = Tk()
+root.state('zoomed')
+root.title("Main Window")
+root.configure(background='#AADFE5')
+
+# Title label
+a = Label(root, text='Rock Paper Scissors', background='#AADFE5', foreground='white', font=('Courier','50'))
+a.pack()
+
+# Image label
+image = PhotoImage(file="A.png")
+img = Label(root, image=image, width=595, height=288)
+img.pack()
+
+
+
+Deuteranopia_Button = Button(root, width=90, height=3, text="Deuteranopia", command=Deuteranopia)
+Deuteranopia_Button.place(x=450, y=300)
+Deuteranopia_Button.pack()
+
+Protanopia_Button = Button(root, width=90, height=3, text="Protanopia", command=Protanopia)
+Protanopia_Button.place(x=450, y=400)
+Protanopia_Button.pack()
+
+Tritanopia_Button = Button(root, width=90, height=3, text="Tritanopia", command=Tritanopia)
+Tritanopia_Button.place(x=450, y=500)
+Tritanopia_Button.pack()
+
+Achromatopsia_Button = Button(root, width=90, height=3, text="Achromatopsia", command=Achromatopsia)
+Achromatopsia_Button.place(x=450, y=600)
+Achromatopsia_Button.pack()
+
+mainloop()
