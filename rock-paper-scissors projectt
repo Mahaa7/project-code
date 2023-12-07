@@ -27,8 +27,8 @@ def Deuteranopia():
     scissor_img_comp = ImageTk.PhotoImage(Image.open("scissors for deu22.png"))
 
     # insert picture
-    user_label = Label(dwu_window, image=scissor_img, bg="#105081")
-    comp_label = Label(dwu_window, image=scissor_img_comp, bg="#105081")
+    user_label = Label(dwu_window, image=paper_img , bg="#105081")
+    comp_label = Label(dwu_window, image=paper_img_comp, bg="#105081")
     comp_label.grid(row=1, column=0, padx=25, pady=25)
     user_label.grid(row=1, column=4, padx=25, pady=25)
 
@@ -48,6 +48,13 @@ def Deuteranopia():
     msg = Label(dwu_window, font=50, bg="#105081", fg="Goldenrod")
     msg.grid(row=3, column=2)
 
+    # disable buttons
+    def disableButtons():
+        rock.config(state=DISABLED)
+        paper.config(state=DISABLED)
+        scissor.config(state=DISABLED)
+
+
     # update message
     def updateMessage(x):
         msg['text'] = x
@@ -57,12 +64,12 @@ def Deuteranopia():
         score = int(playerScore["text"])
         score += 1
         playerScore["text"] = str(score)
-        if score >= 3:
-            updateMessage(f"Congratulations! You won the game and the choice is {situation2}")
-            disableButtons()
-        situation2_length = len(situation2)
-        if situation2_length == 0:
-            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+
+        try:
+            if not situation2:
+                raise ValueError("No text entered!")
+        except ValueError as e:
+            messagebox.showinfo("Error", str(e))
             return  # Return to prevent further execution
 
     def updateCompScore():
@@ -70,22 +77,28 @@ def Deuteranopia():
         score = int(computerScore["text"])
         score += 1
         computerScore["text"] = str(score)
-        if score >= 3:
-            updateMessage(f"Sorry, you lost the game and the choice is {situation1}")
-            disableButtons()
-        situation1_length = len(situation1)
-        if situation1_length == 0:
-            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+        try:
+            if not situation1:
+                raise ValueError("No text entered!")
+        except ValueError as e:
+            messagebox.showinfo("Error", str(e))
             return  # Return to prevent further execution
 
-    # check winner
 
-    # Function to increment the play counter and check if it's the third play
-    def playRound(playerChoice):
-        global playCounter
-        playCounter += 1
-        if playCounter == 3:
-            checkWin(playerChoice, computerScore)
+    def announceWinner():
+        situation1 = situation1_entry.get()
+        situation2 = situation2_entry.get()
+        player_score = int(playerScore["text"])
+        computer_score = int(computerScore["text"])
+        if player_score > computer_score:
+            winner = (f"Congratulations! You're the winner\n"
+                      f" the choice is {situation2}")
+        else:
+            winner = (f'Sorry, you lost\n '
+                      f'the choice is {situation1}')
+        updateMessage(f"{winner}!")
+        disableButtons()
+
 
     # check winner
     def checkWin(player, computer):
@@ -114,27 +127,14 @@ def Deuteranopia():
                 updateUserScore()
         else:
             pass
-        if int(playerScore["text"]) >= 3 or int(computerScore["text"]) >= 3:
+        if int(playerScore["text"]) == 3 or int(computerScore["text"]) == 3:
             announceWinner()
 
-    def announceWinner():
-        situation1 = situation1_entry.get()
-        situation2 = situation2_entry.get()
-        player_score = int(playerScore["text"])
-        computer_score = int(computerScore["text"])
-        if player_score > computer_score:
-            winner = (f"Congratulations! You're the winner\n"
-                      f" the choice is {situation2}")
-        else:
-            winner = (f'Sorry, you lost\n '
-                      f'the choice is {situation1}')
-        updateMessage(f"{winner}!")
-        disableButtons()
+
 
     # update choices
-    choices = ["rock", "paper", "scissor"]
-
     def updateChoice(x):
+        choices = ["rock", "paper", "scissor"]
         # for computer
         compChoice = choices[randint(0, 2)]
         if compChoice == "rock":
@@ -154,12 +154,7 @@ def Deuteranopia():
 
         checkWin(x, compChoice)
 
-        # disable buttons
 
-    def disableButtons():
-        rock.config(state=DISABLED)
-        paper.config(state=DISABLED)
-        scissor.config(state=DISABLED)
 
     # Function to reset the game
     def replay_game():
@@ -168,8 +163,8 @@ def Deuteranopia():
         computerScore["text"] = "0"
 
         # Reset choice labels to default image
-        user_label.configure(image=scissor_img)
-        comp_label.configure(image=scissor_img_comp)
+        user_label.configure(image=paper_img)
+        comp_label.configure(image=paper_img_comp)
 
         # Enable buttons
         rock.config(state=NORMAL)
@@ -227,8 +222,8 @@ def Protanopia():
     paper_img_comp = ImageTk.PhotoImage(Image.open("Paper for Prot.png"))
     scissor_img_comp = ImageTk.PhotoImage(Image.open("scissors for prot2.png"))
     # insert picture
-    user_label = Label(pro_window, image=scissor_img, bg="#6D6417")
-    comp_label = Label(pro_window, image=scissor_img_comp, bg="#6D6417")
+    user_label = Label(pro_window, image=paper_img, bg="#6D6417")
+    comp_label = Label(pro_window, image=paper_img_comp, bg="#6D6417")
     comp_label.grid(row=1, column=0, padx=25, pady=25)
     user_label.grid(row=1, column=4, padx=25, pady=25)
     # scores
@@ -245,6 +240,13 @@ def Protanopia():
     msg = Label(pro_window, font=50, bg="#6D6417", fg="Navy")
     msg.grid(row=3, column=2)
 
+    # disable buttons
+    def disableButtons():
+        rock.config(state=DISABLED)
+        paper.config(state=DISABLED)
+        scissor.config(state=DISABLED)
+
+
     # update message
     def updateMessage(x):
         msg['text'] = x
@@ -254,12 +256,12 @@ def Protanopia():
         score = int(playerScore["text"])
         score += 1
         playerScore["text"] = str(score)
-        if score >= 3:
-            updateMessage(f"Congratulations! You won the game and the choice is {situation2}")
-            disableButtons()
-        situation2_length = len(situation2)
-        if situation2_length == 0:
-            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+
+        try:
+            if not situation2:
+                raise ValueError("No text entered!")
+        except ValueError as e:
+            messagebox.showinfo("Error", str(e))
             return  # Return to prevent further execution
 
     def updateCompScore():
@@ -267,22 +269,13 @@ def Protanopia():
         score = int(computerScore["text"])
         score += 1
         computerScore["text"] = str(score)
-        if score >= 3:
-            updateMessage(f"Sorry, you lost the game and the choice is {situation1}")
-            disableButtons()
-        situation1_length = len(situation1)
-        if situation1_length == 0:
-            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+        try:
+            if not situation1:
+                raise ValueError("No text entered!")
+        except ValueError as e:
+            messagebox.showinfo("Error", str(e))
             return  # Return to prevent further execution
 
-    # Function to increment the play counter and check if it's the third play
-
-
-    def playRound(playerChoice):
-        global playCounter
-        playCounter += 1
-        if playCounter == 3:
-            checkWin(playerChoice, computerScore)
     # check winner
     def checkWin(player, computer):
         if player == computer:
@@ -310,7 +303,7 @@ def Protanopia():
                updateUserScore()
         else:
             pass
-        if int(playerScore["text"]) >= 3 or int(computerScore["text"]) >= 3:
+        if int(playerScore["text"]) == 3 or int(computerScore["text"]) == 3:
             announceWinner()
 
     def announceWinner():
@@ -328,8 +321,9 @@ def Protanopia():
         disableButtons()
 
     # update choices
-    choices = ["rock", "paper", "scissor"]
+
     def updateChoice(x):
+        choices = ["rock", "paper", "scissor"]
         # for computer
         compChoice = choices[randint(0, 2)]
         if compChoice == "rock":
@@ -347,20 +341,14 @@ def Protanopia():
             user_label.configure(image=scissor_img)
         checkWin(x, compChoice)
 
-    # disable buttons
-    def disableButtons():
-        rock.config(state=DISABLED)
-        paper.config(state=DISABLED)
-        scissor.config(state=DISABLED)
-
     # Function to reset the game
     def replay_game():
         # Reset scores to 0
         playerScore["text"] = "0"
         computerScore["text"] = "0"
         # Reset choice labels to default image
-        user_label.configure(image=scissor_img)
-        comp_label.configure(image=scissor_img_comp)
+        user_label.configure(image=paper_img)
+        comp_label.configure(image=paper_img_comp)
         # Enable buttons
         rock.config(state=NORMAL)
         paper.config(state=NORMAL)
@@ -378,7 +366,7 @@ def Protanopia():
     paper.grid(row=2, column=2)
     scissor = Button(pro_window, width=20, height=2, text="SCISSOR", bg="#D5A603", fg="Navy", activebackground="#D5A603", command=lambda: updateChoice("scissor"))
     scissor.grid(row=2, column=3)
-    return_button = Button(pro_window, width=20, height=2, text="RETURN",bg="#6D6417", fg="Navy", activebackground="#6D6417", command=replay_game)
+    return_button = Button(pro_window, width=20, height=2, text="RETURN",bg="#6D6417", fg="Navy", activebackground="#6D6417", command= replay_game)
     return_button.grid(row=7, column=3, pady=(50, 0))
 
     menubar = Menu(root)
@@ -412,8 +400,8 @@ def Tritanopia():
     scissor_img_comp = ImageTk.PhotoImage(Image.open("scissors for trit 2.png"))
 
     # insert picture
-    user_label = Label(tri_window, image=scissor_img, bg="#FFE2E7")
-    comp_label = Label(tri_window, image=scissor_img_comp, bg="#FFE2E7")
+    user_label = Label(tri_window, image=paper_img, bg="#FFE2E7")
+    comp_label = Label(tri_window, image=paper_img_comp, bg="#FFE2E7")
     comp_label.grid(row=1, column=0, padx=25, pady=25)
     user_label.grid(row=1, column=4, padx=25, pady=25)
 
@@ -434,8 +422,13 @@ def Tritanopia():
     msg = Label(tri_window, font=50, bg="#FFE2E7", fg="Mediumvioletred")
     msg.grid(row=3, column=2)
 
-    # update message
+    # disable buttons
+    def disableButtons():
+        rock.config(state=DISABLED)
+        paper.config(state=DISABLED)
+        scissor.config(state=DISABLED)
 
+    # update message
     def updateMessage(x):
         msg['text'] = x
 
@@ -444,37 +437,25 @@ def Tritanopia():
         score = int(playerScore["text"])
         score += 1
         playerScore["text"] = str(score)
-        if score >= 3:
-            updateMessage(f"Congratulations! You won the game and the choice is {situation2}")
-            disableButtons()
-        situation2_length = len(situation2)
-        if situation2_length == 0:
-            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
-            return  # Return to prevent further execution
 
+        try:
+            if not situation2:
+                raise ValueError("No text entered!")
+        except ValueError as e:
+            messagebox.showinfo("Error", str(e))
+            return  # Return to prevent further execution
 
     def updateCompScore():
         situation1 = situation1_entry.get()
         score = int(computerScore["text"])
         score += 1
         computerScore["text"] = str(score)
-        if score >= 3:
-            updateMessage(f"Sorry, you lost the game and the choice is {situation1}")
-            disableButtons()
-        situation1_length = len(situation1)
-        if situation1_length == 0:
-            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+        try:
+            if not situation1:
+                raise ValueError("No text entered!")
+        except ValueError as e:
+            messagebox.showinfo("Error", str(e))
             return  # Return to prevent further execution
-
-
-
-
-    # Function to increment the play counter and check if it's the third play
-    def playRound(playerChoice):
-        global playCounter
-        playCounter += 1
-        if playCounter == 3:
-            checkWin(playerChoice, computerScore)
 
     # check winner
     def checkWin(player, computer):
@@ -503,7 +484,7 @@ def Tritanopia():
                 updateUserScore()
         else:
             pass
-        if int(playerScore["text"]) >= 3 or int(computerScore["text"]) >= 3:
+        if int(playerScore["text"]) == 3 or int(computerScore["text"]) == 3:
             announceWinner()
 
 
@@ -548,12 +529,6 @@ def Tritanopia():
         checkWin(x, compChoice)
 
 
-# disable buttons
-    def disableButtons():
-        rock.config(state=DISABLED)
-        paper.config(state=DISABLED)
-        scissor.config(state=DISABLED)
-
     # Function to reset the game
 
 
@@ -563,8 +538,8 @@ def Tritanopia():
         computerScore["text"] = "0"
 
         # Reset choice labels to default image
-        user_label.configure(image=scissor_img)
-        comp_label.configure(image=scissor_img_comp)
+        user_label.configure(image=paper_img)
+        comp_label.configure(image=paper_img_comp)
 
         # Enable buttons
         rock.config(state=NORMAL)
@@ -626,8 +601,8 @@ def Achromatopsia():
     scissor_img_comp = ImageTk.PhotoImage(Image.open("scissors for ach2.png"))
 
     # insert picture
-    user_label = Label(ach_window, image=scissor_img, bg="#D5D5D5")
-    comp_label = Label(ach_window, image=scissor_img_comp, bg="#D5D5D5")
+    user_label = Label(ach_window, image=paper_img, bg="#D5D5D5")
+    comp_label = Label(ach_window, image=paper_img_comp, bg="#D5D5D5")
     comp_label.grid(row=1, column=0, padx=25, pady=25)
     user_label.grid(row=1, column=4, padx=25, pady=25)
 
@@ -647,6 +622,13 @@ def Achromatopsia():
     msg = Label(ach_window, font=50, bg="#D5D5D5", fg="Black")
     msg.grid(row=3, column=2)
 
+    # disable buttons
+    def disableButtons():
+        rock.config(state=DISABLED)
+        paper.config(state=DISABLED)
+        scissor.config(state=DISABLED)
+
+
     # update message
     def updateMessage(x):
         msg['text'] = x
@@ -656,12 +638,12 @@ def Achromatopsia():
         score = int(playerScore["text"])
         score += 1
         playerScore["text"] = str(score)
-        if score >= 3:
-            updateMessage(f"Congratulations! You won the game and the choice is {situation2}")
-            disableButtons()
-        situation2_length = len(situation2)
-        if situation2_length == 0:
-            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+
+        try:
+            if not situation2:
+                raise ValueError("No text entered!")
+        except ValueError as e:
+            messagebox.showinfo("Error", str(e))
             return  # Return to prevent further execution
 
     def updateCompScore():
@@ -669,22 +651,12 @@ def Achromatopsia():
         score = int(computerScore["text"])
         score += 1
         computerScore["text"] = str(score)
-        if score >= 3:
-            updateMessage(f"Sorry, you lost the game and the choice is {situation1}")
-            disableButtons()
-        situation1_length = len(situation1)
-        if situation1_length == 0:
-            messagebox.showinfo("Error", "NO TEXT ENTERED!!")
+        try:
+            if not situation1:
+                raise ValueError("No text entered!")
+        except ValueError as e:
+            messagebox.showinfo("Error", str(e))
             return  # Return to prevent further execution
-
-    # check winner
-
-    # Function to increment the play counter and check if it's the third play
-    def playRound(playerChoice):
-        global playCounter
-        playCounter += 1
-        if playCounter == 3:
-            checkWin(playerChoice, computerScore)
 
     # check winner
     def checkWin(player, computer):
@@ -713,7 +685,7 @@ def Achromatopsia():
                 updateUserScore()
         else:
             pass
-        if int(playerScore["text"]) >= 3 or int(computerScore["text"]) >= 3:
+        if int(playerScore["text"]) == 3 or int(computerScore["text"]) == 3:
             announceWinner()
 
     def announceWinner():
@@ -753,13 +725,6 @@ def Achromatopsia():
 
         checkWin(x, compChoice)
 
-        # disable buttons
-
-    def disableButtons():
-        rock.config(state=DISABLED)
-        paper.config(state=DISABLED)
-        scissor.config(state=DISABLED)
-
     # Function to reset the game
     def replay_game():
         # Reset scores to 0
@@ -767,8 +732,8 @@ def Achromatopsia():
         computerScore["text"] = "0"
 
         # Reset choice labels to default image
-        user_label.configure(image=scissor_img)
-        comp_label.configure(image=scissor_img_comp)
+        user_label.configure(image=paper_img)
+        comp_label.configure(image=paper_img_comp)
 
         # Enable buttons
         rock.config(state=NORMAL)
